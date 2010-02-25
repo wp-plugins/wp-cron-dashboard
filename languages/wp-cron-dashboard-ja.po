@@ -1,0 +1,41 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: wp-cron-dashboard\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2010-02-24 12:49+0900\n"
+"Last-Translator: wokamoto <wokamoto1973@gmail.com>\n"
+"Language-Team: JAPANESE <http://wppluginsj.sourceforge.jp/>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Japanese\n"
+"X-Poedit-Country: JAPAN\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+msgid "Pseudo Cron Dashboard Display for Wordpress"
+msgstr "WordPress で設定されている cron ジョブをダッシュボードに表示します。 "
+
+msgid "WP-Cron"
+msgstr "WP-Cron"
+
+msgid "Overview of tasks scheduled for WP-Cron"
+msgstr "WP-Cron のための予定されたタスク"
+
+msgid "Sucessfully unscheduled"
+msgstr "タスクは正常に削除されました"
+
+msgid "Current date/time is"
+msgstr "現在の時刻"
+
+msgid "Nothing scheduled"
+msgstr "予定されたタスクはありません"
+
+msgid "Anytime after <strong>%s</strong> execute tasks"
+msgstr "タスク実行予定時刻: <strong>%s</strong>"
+
+msgid "Entry #"
+msgstr "No."
+
+msgid "Delete"
+msgstr "削除"
+
