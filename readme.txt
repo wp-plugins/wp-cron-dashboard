@@ -6,11 +6,11 @@ Requires at least: 2.5
 Tested up to: 2.9.2
 Stable tag: 1.1.0
 
-Pseudo Cron Dashboard Display for Wordpress.
+WP-Cron Dashboard Display for Wordpress.
 
 == Description ==
 
-Pseudo Cron Dashboard Display for Wordpress.
+WP-Cron Dashboard Display for Wordpress.
 
 == Installation ==
 
@@ -20,14 +20,6 @@ Pseudo Cron Dashboard Display for Wordpress.
 The control panel of Head Cleaner is in 'Tool > WP-Cron'.
 
 == Upgrade Notice ==
-
-none.
-
-== Frequently Asked Questions ==
-
-none.
-
-== Screenshots ==
 
 none.
 

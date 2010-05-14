@@ -2,7 +2,7 @@
 /*
 Plugin Name: WP-Cron Dashboard
 Plugin URI: http://wppluginsj.sourceforge.jp/i18n-ja_jp/wp-cron-dashboard/
-Description: Pseudo Cron Dashboard Display for Wordpress
+Description: WP-Cron Dashboard Display for Wordpress
 Author: wokamoto
 Version: 1.1.0
 Author URI: http://dogmap.jp/
