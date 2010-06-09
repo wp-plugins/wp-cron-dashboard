@@ -12,6 +12,11 @@ WP-Cron Dashboard Display for Wordpress.
 
 WP-Cron Dashboard Display for Wordpress.
 
+= Localization =
+* Japanese (ja) - [OKAMOTO Wataru](http://dogmap.jp/ "dogmap.jp") (plugin author)
+
+If you have translated into your language, please let me know.
+
 == Installation ==
 
 1. Upload the entire `wp-cron-dashboard` folder to the `/wp-content/plugins/` directory.
