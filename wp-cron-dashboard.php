@@ -4,7 +4,7 @@ Plugin Name: WP-Cron Dashboard
 Plugin URI: http://wppluginsj.sourceforge.jp/i18n-ja_jp/wp-cron-dashboard/
 Description: WP-Cron Dashboard Display for Wordpress
 Author: wokamoto
-Version: 1.1.0
+Version: 1.1.1
 Author URI: http://dogmap.jp/
 Text Domain: wp-cron-dashboard
 Domain Path: /languages/
@@ -46,6 +46,7 @@ class CronDashboard {
 	function __construct() {
 		$this->_set_plugin_dir(__FILE__);
 		$this->_load_textdomain();
+		add_action('admin_menu', array($this, 'add_admin_menu'));
 	}
 
 	// set plugin dir
@@ -91,16 +92,12 @@ class CronDashboard {
 	function add_admin_menu($s) {
 		global $wp_version;
 
-		// User Level Permission
-		//  -- Subscriber = 0,Contributor = 1,Author = 2,Editor= 7,Administrator = 9
-		$user_level = 9;
-
 		add_submenu_page(
 			version_compare($wp_version, "2.7", ">=") ? 'tools.php' : 'edit.php',
 			'wp-cron' ,
 			__('WP-Cron', $this->textdomain_name) ,
-			$user_level ,
-			__FILE__ ,
+			'administrator' ,
+			dirname(__FILE__) ,
 			array(&$this, 'wp_cron_menu')
 		);
 		return $s;
@@ -184,7 +181,5 @@ class CronDashboard {
 	}
 }
 
-$crondashboard = new CronDashboard;
-add_action('admin_menu', array($crondashboard, 'add_admin_menu'));
-unset($crondashboard);
+new CronDashboard();
 ?>
