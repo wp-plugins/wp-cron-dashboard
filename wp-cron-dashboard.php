@@ -171,10 +171,12 @@ class CronDashboard {
 					$ans .= '<div id="tasks-'.$count.'" style="margin:.5em;width:70%;">'."\n";
 
 					$ans .= __('Entry #',$this->textdomain_name).$count.': '.$procname."\n";
-					$ans .= ( has_action( $procname, $procname )
-						? '<span style="color:green;" >&#8730;</span>'.__(' action exists',$this->textdomain_name)
-						: '<span style="color:red;">X</span>'.__(' no action exists with this name',$this->textdomain_name)
-						);
+					if ( function_exists('has_action') ) {
+						$ans .= ( has_action( $procname )
+							? '<span style="color:green;" >&#8730;</span>'.__(' action exists',$this->textdomain_name)
+							: '<span style="color:red;">X</span>'.__(' no action exists with this name',$this->textdomain_name)
+							);
+					}
 					// Add in delete button for each entry.
 					$ans .= '<form method="post">'."\n";
 					$ans .= '<input type="hidden" name="procname" value="'.$procname.'"/>'."\n";
