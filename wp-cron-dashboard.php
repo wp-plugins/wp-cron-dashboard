@@ -4,7 +4,7 @@ Plugin Name: WP-Cron Dashboard
 Plugin URI: http://wppluginsj.sourceforge.jp/i18n-ja_jp/wp-cron-dashboard/
 Description: WP-Cron Dashboard Display for Wordpress
 Author: wokamoto
-Version: 1.1.1
+Version: 1.1.2
 Author URI: http://dogmap.jp/
 Text Domain: wp-cron-dashboard
 Domain Path: /languages/
@@ -125,7 +125,7 @@ class CronDashboard {
 		$out .= $this->show_cron_schedules($datetime_format);
 		$out .= '<br/>'."\n";
 
-		$out .= __('Current date/time is',$this->textdomain_name).": <strong>".date($datetime_format)."</strong>\n";
+		$out .= __('Current date/time is',$this->textdomain_name).": <strong>".current_time('mysql')."</strong>\n";
 		$out .= "</div>";
 
 		// Output
@@ -144,6 +144,10 @@ class CronDashboard {
 	function show_cron_schedules($datetime_format = '') {
 		if ($datetime_format == '')
 			$datetime_format = get_option("date_format")." @".get_option("time_format");
+		
+		$utctzobj = timezone_open('UTC');	
+		if ($tz = get_option ('timezone_string') ) $tzobj = timezone_open($tz);	
+		else $tzobj = $utctzobj;
 
 		$ans = '';
 		$timeslots = $this->_get_cron_array();
@@ -154,16 +158,23 @@ class CronDashboard {
 		} else {
 			$count = 1;
 			foreach ( $timeslots as $time => $tasks ) {
+				$timeintz = new DateTime(date('Y-m-d H:i:s', $time), $utctzobj);
+				date_timezone_set( $timeintz, $tzobj );
 				$ans .= '<div style="margin:.5em 0;width:100%;">';
 				$ans .= sprintf(
 					__('Anytime after <strong>%s</strong> execute tasks',$this->textdomain_name) ,
-					date($datetime_format, $time)
+//					date($datetime_format, $time)
+					$timeintz->format('Y-m-d H:i:s')
 					);
 				$ans .= '</div>'."\n";
 				foreach ($tasks as $procname => $task) {
 					$ans .= '<div id="tasks-'.$count.'" style="margin:.5em;width:70%;">'."\n";
 
 					$ans .= __('Entry #',$this->textdomain_name).$count.': '.$procname."\n";
+					$ans .= ( has_action( $procname, $procname )
+						? '<span style="color:green;" >&#8730;</span>'.__(' action exists',$this->textdomain_name)
+						: '<span style="color:red;">X</span>'.__(' no action exists with this name',$this->textdomain_name)
+						);
 					// Add in delete button for each entry.
 					$ans .= '<form method="post">'."\n";
 					$ans .= '<input type="hidden" name="procname" value="'.$procname.'"/>'."\n";
