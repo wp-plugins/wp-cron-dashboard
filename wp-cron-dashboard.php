@@ -144,10 +144,12 @@ class CronDashboard {
 	function show_cron_schedules($datetime_format = '') {
 		if ($datetime_format == '')
 			$datetime_format = get_option("date_format")." @".get_option("time_format");
-		
-		$utctzobj = timezone_open('UTC');	
-		if ($tz = get_option ('timezone_string') ) $tzobj = timezone_open($tz);	
-		else $tzobj = $utctzobj;
+
+		$utctzobj = timezone_open('UTC');
+		$tzobj = ( $tz = get_option('timezone_string')
+			? timezone_open($tz)
+			: $utctzobj
+			);
 
 		$ans = '';
 		$timeslots = $this->_get_cron_array();
