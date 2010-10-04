@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: wp-cron-dashboard\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-10-04 15:20+0900\n"
-"PO-Revision-Date: 2010-10-04 15:28+0900\n"
+"PO-Revision-Date: 2010-10-04 15:55+0900\n"
 "Last-Translator: wokamoto <wokamoto1973@gmail.com>\n"
 "Language-Team: JAPANESE <http://wppluginsj.sourceforge.jp/>\n"
 "MIME-Version: 1.0\n"
@@ -51,11 +51,11 @@ msgstr "No."
 
 #: ../wp-cron-dashboard.php:175
 msgid " action exists"
-msgstr "アクションフックに登録されています。"
+msgstr " アクションフックに登録されています。"
 
 #: ../wp-cron-dashboard.php:176
 msgid " no action exists with this name"
-msgstr "アクションフックに登録されていません。"
+msgstr " アクションフックに登録されていません。"
 
 #: ../wp-cron-dashboard.php:182
 msgid "Delete"
