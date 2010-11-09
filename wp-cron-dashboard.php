@@ -4,7 +4,7 @@ Plugin Name: WP-Cron Dashboard
 Plugin URI: http://wppluginsj.sourceforge.jp/i18n-ja_jp/wp-cron-dashboard/
 Description: WP-Cron Dashboard Display for Wordpress
 Author: wokamoto
-Version: 1.1.2
+Version: 1.1.3
 Author URI: http://dogmap.jp/
 Text Domain: wp-cron-dashboard
 Domain Path: /languages/
@@ -141,15 +141,20 @@ class CronDashboard {
 		}
 	}
 
+	function get_tz_timestamp($timestamp) {
+		$utctzobj = timezone_open('UTC');	
+		if  ( $tz = get_option('timezone_string') )  
+			$tzobj = timezone_open($tz);
+		else
+			$tzobj = $utctzobj;
+		$timeintz = new DateTime(date('Y-m-d H:i:s', $timestamp), $utctzobj);
+		date_timezone_set( $timeintz, $tzobj );
+		return strtotime( $timeintz->format('Y-m-d H:i:s') );
+	}
+
 	function show_cron_schedules($datetime_format = '') {
 		if ($datetime_format == '')
 			$datetime_format = get_option("date_format")." @".get_option("time_format");
-
-		$utctzobj = timezone_open('UTC');
-		$tzobj = ( $tz = get_option('timezone_string')
-			? timezone_open($tz)
-			: $utctzobj
-			);
 
 		$ans = '';
 		$timeslots = $this->_get_cron_array();
@@ -160,13 +165,10 @@ class CronDashboard {
 		} else {
 			$count = 1;
 			foreach ( $timeslots as $time => $tasks ) {
-				$timeintz = new DateTime(date('Y-m-d H:i:s', $time), $utctzobj);
-				date_timezone_set( $timeintz, $tzobj );
 				$ans .= '<div style="margin:.5em 0;width:100%;">';
 				$ans .= sprintf(
 					__('Anytime after <strong>%s</strong> execute tasks',$this->textdomain_name) ,
-//					date($datetime_format, $time)
-					$timeintz->format('Y-m-d H:i:s')
+					date($datetime_format, $this->get_tz_timestamp($time))
 					);
 				$ans .= '</div>'."\n";
 				foreach ($tasks as $procname => $task) {
