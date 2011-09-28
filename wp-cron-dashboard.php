@@ -4,7 +4,7 @@ Plugin Name: WP-Cron Dashboard
 Plugin URI: http://wppluginsj.sourceforge.jp/i18n-ja_jp/wp-cron-dashboard/
 Description: WP-Cron Dashboard Display for Wordpress
 Author: wokamoto
-Version: 1.1.4
+Version: 1.1.5
 Author URI: http://dogmap.jp/
 Text Domain: wp-cron-dashboard
 Domain Path: /languages/
@@ -15,7 +15,7 @@ License:
  Released under the GPL license
   http://www.gnu.org/copyleft/gpl.html
 
-  Copyright 2007-2010 wokamoto (email : wokamoto1973@gmail.com)
+  Copyright 2007-2011 wokamoto (email : wokamoto1973@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -148,7 +148,7 @@ class CronDashboard {
 
 	function _set_cron_array($cron) {
 		if ( function_exists('_set_cron_array') ) {
-			_set_cron_array( $crons );
+			_set_cron_array( $cron );
 		} else {
 			$cron['version'] = 2;
 			update_option( 'cron', $cron );
@@ -218,12 +218,14 @@ class CronDashboard {
 		} else {
 			$count = 1;
 			foreach ( $timeslots as $time => $tasks ) {
-				$ans .= '<div style="margin:.5em 0;width:100%;">';
-				$ans .= sprintf(
-					__('Anytime after <strong>%s</strong> execute tasks',$this->textdomain_name) ,
-					date($datetime_format, $this->get_tz_timestamp($time))
-					);
-				$ans .= '</div>'."\n";
+				if (count($tasks) > 0) {
+					$ans .= '<div style="margin:.5em 0;width:100%;">';
+					$ans .= sprintf(
+						__('Anytime after <strong>%s</strong> execute tasks',$this->textdomain_name) ,
+						date($datetime_format, $this->get_tz_timestamp($time))
+						);
+					$ans .= '</div>'."\n";
+				}
 				foreach ($tasks as $procname => $task) {
 					$ans .= '<div id="tasks-'.$count.'" style="margin:.5em;width:70%;">'."\n";
 
@@ -257,4 +259,3 @@ class CronDashboard {
 }
 
 new CronDashboard();
-?>
