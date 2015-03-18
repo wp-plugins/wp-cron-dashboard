@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=9S8AJ
 Tags: wp-cron
 Requires at least: 2.5
 Tested up to: 3.2.1
-Stable tag: 1.1.5
+Stable tag: 1.1.6
 
 WP-Cron Dashboard Display for Wordpress.
 
@@ -29,6 +29,9 @@ The control panel of Head Cleaner is in 'Tool > WP-Cron'.
 none.
 
 == Changelog == 
+
+**1.1.6 - March 18, 2015**
+Security fix.
 
 **1.1.5 - September 28, 2011**
 Support for WordPress 3.2.1
