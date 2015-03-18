@@ -4,7 +4,7 @@ Plugin Name: WP-Cron Dashboard
 Plugin URI: http://wppluginsj.sourceforge.jp/i18n-ja_jp/wp-cron-dashboard/
 Description: WP-Cron Dashboard Display for Wordpress
 Author: wokamoto
-Version: 1.1.6
+Version: 1.1.7
 Author URI: http://dogmap.jp/
 Text Domain: wp-cron-dashboard
 Domain Path: /languages/
@@ -40,9 +40,6 @@ class CronDashboard {
 	/*
 	* Constructor
 	*/
-	function CronDashboard() {
-		$this->__construct();
-	}
 	function __construct() {
 		$this->_set_plugin_dir(__FILE__);
 		$this->_load_textdomain();
