@@ -4,7 +4,7 @@ Plugin Name: WP-Cron Dashboard
 Plugin URI: http://wppluginsj.sourceforge.jp/i18n-ja_jp/wp-cron-dashboard/
 Description: WP-Cron Dashboard Display for Wordpress
 Author: wokamoto
-Version: 1.1.1
+Version: 1.1.7
 Author URI: http://dogmap.jp/
 Text Domain: wp-cron-dashboard
 Domain Path: /languages/
@@ -15,7 +15,7 @@ License:
  Released under the GPL license
   http://www.gnu.org/copyleft/gpl.html
 
-  Copyright 2007-2010 wokamoto (email : wokamoto1973@gmail.com)
+  Copyright 2007-2011 wokamoto (email : wokamoto1973@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,9 +40,6 @@ class CronDashboard {
 	/*
 	* Constructor
 	*/
-	function CronDashboard() {
-		$this->__construct();
-	}
 	function __construct() {
 		$this->_set_plugin_dir(__FILE__);
 		$this->_load_textdomain();
@@ -110,26 +107,52 @@ class CronDashboard {
 		$out = '';
 		$datetime_format = get_option("date_format")." @".get_option("time_format");
 
+		$crons = '';
 		if (isset($_POST['submit'])) {
-			wp_unschedule_event($_POST['time'], $_POST['procname']);
+			$key = esc_html(isset($_POST['key']) ? $_POST['key'] : '');
+			$procname = esc_html(isset($_POST['procname']) ? $_POST['procname'] : '');
+			$proctime = esc_html(isset($_POST['time']) ? $_POST['time'] : '');
+			$crons = $this->_unschedule_event($proctime, $procname, $key);
 
 			// Note snuff
 			$note .= '<div id="message" class="updated fade"><p>';
-			$note .= __('Sucessfully unscheduled',$this->textdomain_name)." ".$_POST['procname']." (".date($datetime_format,$_POST['time']).")";
+			$note .= __('Sucessfully unscheduled',$this->textdomain_name)." ";
+			$note .= $procname;
+			$note .= " (".date($datetime_format,$this->get_tz_timestamp($_POST['time'])).")";
 			$note .= '</p></div>'."\n";
 		}
 
 		$out .= '<div class="wrap">'."\n";
 		$out .= '<h2>'.__('Overview of tasks scheduled for WP-Cron',$this->textdomain_name).'</h2>'."\n";
 
-		$out .= $this->show_cron_schedules($datetime_format);
+		$out .= $this->show_cron_schedules($datetime_format, $crons);
 		$out .= '<br/>'."\n";
 
-		$out .= __('Current date/time is',$this->textdomain_name).": <strong>".date($datetime_format)."</strong>\n";
+		$out .= __('Current date/time is',$this->textdomain_name).": <strong>".current_time('mysql')."</strong>\n";
 		$out .= "</div>";
 
 		// Output
 		echo $note.$out."\n";
+	}
+
+	function _unschedule_event( $timestamp, $hook, $key ) {
+		$crons = $this->_get_cron_array();
+		unset( $crons[$timestamp][$hook][$key] );
+		if ( empty($crons[$timestamp][$hook]) )
+			unset( $crons[$timestamp][$hook] );
+		if ( empty($crons[$timestamp]) )
+			unset( $crons[$timestamp] );
+		$this->_set_cron_array( $crons );
+		return $crons;
+	}
+
+	function _set_cron_array($cron) {
+		if ( function_exists('_set_cron_array') ) {
+			_set_cron_array( $cron );
+		} else {
+			$cron['version'] = 2;
+			update_option( 'cron', $cron );
+		}
 	}
 
 	function _get_cron_array() {
@@ -137,16 +160,57 @@ class CronDashboard {
 			return _get_cron_array();
 		} else {
 			$cron = get_option('cron');
-			return ( is_array($cron) ? $cron : false );
+			if ( !is_array($cron) )
+				return false;
+			if ( !isset($cron['version']) )
+				$cron = $this->_upgrade_cron_array($cron);
+			unset($cron['version']);
+			return $cron;
 		}
 	}
 
-	function show_cron_schedules($datetime_format = '') {
-		if ($datetime_format == '')
-			$datetime_format = get_option("date_format")." @".get_option("time_format");
+	function _upgrade_cron_array($cron) {
+		if ( function_exists('_upgrade_cron_array') ) {
+			return _upgrade_cron_array($cron);
+		} else {
+			if ( isset($cron['version']) && 2 == $cron['version'])
+				return $cron;
+			$new_cron = array();
+			foreach ( (array) $cron as $timestamp => $hooks) {
+				foreach ( (array) $hooks as $hook => $args ) {
+					$key = md5(serialize($args['args']));
+					$new_cron[$timestamp][$hook][$key] = $args;
+				}
+			}
+			$new_cron['version'] = 2;
+			update_option( 'cron', $new_cron );
+			return $new_cron;
+		}
+	}
+
+	function get_tz_timestamp($timestamp) {
+		$utctzobj = timezone_open('UTC');	
+		if  ( $tz = get_option('timezone_string') )  
+			$tzobj = timezone_open($tz);
+		else
+			$tzobj = $utctzobj;
+		$timeintz = new DateTime(date('Y-m-d H:i:s', $timestamp), $utctzobj);
+		date_timezone_set( $timeintz, $tzobj );
+		return strtotime( $timeintz->format('Y-m-d H:i:s') );
+	}
+
+	function show_cron_schedules($datetime_format = '', $crons = '') {
+		$datetime_format =
+			$datetime_format == ''
+			? get_option("date_format")." @".get_option("time_format")
+			: $datetime_format;
 
 		$ans = '';
-		$timeslots = $this->_get_cron_array();
+		$timeslots =
+			$crons == ''
+			? $this->_get_cron_array()
+			: $crons;
+
 		if ( empty($timeslots) ) {
 			$ans .= '<div style="margin:.5em 0;width:100%;">';
 			$ans .= __('Nothing scheduled',$this->textdomain_name);
@@ -154,20 +218,33 @@ class CronDashboard {
 		} else {
 			$count = 1;
 			foreach ( $timeslots as $time => $tasks ) {
-				$ans .= '<div style="margin:.5em 0;width:100%;">';
-				$ans .= sprintf(
-					__('Anytime after <strong>%s</strong> execute tasks',$this->textdomain_name) ,
-					date($datetime_format, $time)
-					);
-				$ans .= '</div>'."\n";
+				if (count($tasks) > 0) {
+					$ans .= '<div style="margin:.5em 0;width:100%;">';
+					$ans .= sprintf(
+						__('Anytime after <strong>%s</strong> execute tasks',$this->textdomain_name) ,
+						date($datetime_format, $this->get_tz_timestamp($time))
+						);
+					$ans .= '</div>'."\n";
+				}
 				foreach ($tasks as $procname => $task) {
 					$ans .= '<div id="tasks-'.$count.'" style="margin:.5em;width:70%;">'."\n";
 
 					$ans .= __('Entry #',$this->textdomain_name).$count.': '.$procname."\n";
+					if ( function_exists('has_action') ) {
+						$ans .= ( has_action( $procname )
+							? '<span style="color:green;" >&#8730;</span>'.__(' action exists',$this->textdomain_name)
+							: '<span style="color:red;">X</span>'.__(' no action exists with this name',$this->textdomain_name)
+							);
+					}
+					$prockey = '';
+					foreach ($task as $key => $args) {
+						$prockey = $key;
+					}
 					// Add in delete button for each entry.
 					$ans .= '<form method="post">'."\n";
 					$ans .= '<input type="hidden" name="procname" value="'.$procname.'"/>'."\n";
 					$ans .= '<input type="hidden" name="time" value="'.$time.'"/>'."\n";
+					$ans .= '<input type="hidden" name="key" value="'.$prockey.'"/>'."\n";
 					$ans .= '<input name="submit" style="float:right; margin-top: -20px;" type="submit" value="'.__('Delete',$this->textdomain_name).'"/>'."\n";
 					$ans .= '</form>'."\n";
 
@@ -182,4 +259,3 @@ class CronDashboard {
 }
 
 new CronDashboard();
-?>
